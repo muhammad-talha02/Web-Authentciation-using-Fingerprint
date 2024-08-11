@@ -19,7 +19,7 @@ export const POST = async (request:Request)=>{
         }
         
         // cookieStore.set("talha", 'malik', {maxAge:60, httpOnly:true})
-        const response = NextResponse.json({success:false,data:user}, {status:200})
+        const response = NextResponse.json({success:true,data:user}, {status:200})
       const token =  SignAccessToken(user?.id)
       console.log("user", token)
         response.cookies.set("user", token, {maxAge:60, httpOnly:true})

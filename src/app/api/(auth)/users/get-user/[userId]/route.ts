@@ -12,7 +12,7 @@ export const GET = async (
   const cookieStore = cookies();
   const { userId } = params;
   const userToken = cookieStore.get("user")?.value || "";
-  if (isAuthenticate(userToken)) {
+  if (userToken && isAuthenticate(userToken)) {
     try {
       await connectDB();
       const user = await User.findById(userId);

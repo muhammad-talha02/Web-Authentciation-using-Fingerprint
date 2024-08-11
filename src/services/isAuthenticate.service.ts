@@ -8,6 +8,7 @@ export const verifyAccessToken = (token: string) => {
 };
 
 export const isAuthenticate = (token: string) => {
+    console.log("decoded", token)
   const isVerified = verifyAccessToken(token);
   if (isVerified) {
     return true;
