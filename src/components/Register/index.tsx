@@ -1,11 +1,15 @@
 "use client";
 import { styles } from "@/styles";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react";
+import FingerprintButton from "../FingerprintButton";
+import { startRegistration } from "@simplewebauthn/browser";
 
 const Register = () => {
   const router = useRouter();
+  const [showPassKey, setShowPassKey] = useState(false)
   const [registerValues, setRegisterValues] = useState({
     username: "",
     email: "malik@gmail.com",
@@ -34,13 +38,42 @@ const Register = () => {
 
       const result = await response.json();
       if (result.success) {
-        alert("User Registered successfully");
-        router.push("/login");
+        setShowPassKey(true)
+        handleRegisterPasskey(result.data)
       } else {
         alert("User Already Exist");
       }
     } catch (error) {
       alert("Registration failed!");
+    }
+  };
+
+  const handleRegisterPasskey = async (user:any) => {
+  
+    try {
+      const response = await fetch("/api/authentication/register-challenge", {
+        body: JSON.stringify(user),
+        method: "POST",
+      });
+
+      const result = await response.json();
+      if (result.success) {
+
+        const { options } = result;
+
+        const authenticationResponse =
+          await startRegistration(options);
+       
+        const res = await fetch("/api/authentication/register-verify", {
+          body: JSON.stringify({userId:user?.id , cred:authenticationResponse}),
+          method: "POST",
+        });
+
+      } else {
+        alert("something wrong");
+      }
+    } catch (error) {
+      alert("failed!");
     }
   };
 
@@ -56,106 +89,87 @@ const Register = () => {
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Create an account
+              {showPassKey ? "Resgister Passkey" : 'Create an account'}
             </h1>
-            <form className="space-y-4 md:space-y-6" onSubmit={handleRegister}>
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Username
-                </label>
-                <input
-                  type="text"
-                  onChange={handleChange}
-                  value={registerValues.username}
-                  name="username"
-                  id="username"
-                  className={styles.inputStyle}
-                  placeholder="name@company.com"
-                  required
-                  minLength={5}
-                  autoComplete="off"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  onChange={handleChange}
-                  value={registerValues.email}
-                  id="email"
-                  className={styles.inputStyle}
-                  placeholder="name@company.com"
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  onChange={handleChange}
-                  value={registerValues.password}
-                  name="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className={styles.inputStyle}
-                />
-              </div>
-              {/* <div className="flex items-center justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="remember"
-                      aria-describedby="remember"
-                      type="checkbox"
-                      className={styles.inputStyle}
-                      />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="remember"
-                      className="text-gray-500 dark:text-gray-300"
-                    >
-                      Remember me
-                    </label>
-                  </div>
+            {
+              showPassKey ?             <div className="flex justify-center items-center">
+              <FingerprintButton />
+            </div> : 
+                <form className="space-y-4 md:space-y-6" onSubmit={handleRegister}>
+                <div>
+                  <label
+                    htmlFor="username"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    onChange={handleChange}
+                    value={registerValues.username}
+                    name="username"
+                    id="username"
+                    className={styles.inputStyle}
+                    placeholder="name@company.com"
+                    required
+                    minLength={5}
+                    autoComplete="off"
+                  />
                 </div>
-                <a
-                  href="#"
-                  className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    onChange={handleChange}
+                    value={registerValues.email}
+                    id="email"
+                    className={styles.inputStyle}
+                    placeholder="name@company.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    onChange={handleChange}
+                    value={registerValues.password}
+                    name="password"
+                    id="password"
+                    placeholder="••••••••"
+                    className={styles.inputStyle}
+                  />
+                </div>     
+                <button
+                  type="submit"
+                  className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
-                  Forgot password?
-                </a>
-              </div> */}
-              <button
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Sign up
-              </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </form>
+                  Sign up
+                </button>
+                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </form>
+            }
+
+        
           </div>
         </div>
       </div>

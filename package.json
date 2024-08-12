@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "^10.0.0",
+    "@simplewebauthn/server": "^10.0.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.2",
     "next": "14.2.5",

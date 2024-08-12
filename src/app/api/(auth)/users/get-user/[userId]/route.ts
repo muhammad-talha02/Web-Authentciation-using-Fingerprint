@@ -25,7 +25,7 @@ export const GET = async (
     }
   } else {
     return NextResponse.json(
-      { success: true, message: "Please login to access this source" },
+      { success: false, message: "Please login to access this" },
       { status: 401 }
     );
   }
