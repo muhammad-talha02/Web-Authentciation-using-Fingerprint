@@ -2,9 +2,10 @@ import { connectDB } from "@/lib/db"
 import { Challenge } from "@/modals"
 import { isAuthenticate } from "@/services/isAuthenticate.service"
 import { generateRegistrationOptions } from "@simplewebauthn/server"
+import { Types } from "mongoose"
 import { cookies } from "next/headers"
 
-export const POST = async(request:Request)=>{
+export const POST = async (request:Request)=>{
 
     // const token = cookies().get('user')?.value || ''
     // const user = isAuthenticate(token)
@@ -13,19 +14,18 @@ export const POST = async(request:Request)=>{
     // }
     try {
         await connectDB()
-        const {user} = await request.json()
+        const user = await request.json()
         const payload = await generateRegistrationOptions({
             rpID:"localhost",
             rpName:'Local Machine',
-            userName:user?.name
+            userName:user?.userName
         })
-        console.log(user, "userId")
 
         const newChallenge = await Challenge.create({
-            userId:user,
-            challenge:new Map(Object.entries(payload.challenge))
+            userId:new Types.ObjectId(user?._id),
+            challenge:payload.challenge
         })
-        return Response.json({success:true,options:payload, data:newChallenge}, {status:201})
+        return Response.json({success:true,options:payload}, {status:201})
     } catch (error) {
         return Response.json({success:false,error}, {status:400})
         

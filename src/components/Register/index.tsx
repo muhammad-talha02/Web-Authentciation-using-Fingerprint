@@ -39,7 +39,7 @@ const Register = () => {
       const result = await response.json();
       if (result.success) {
         setShowPassKey(true)
-        handleRegisterPasskey(result.data)
+       await handleRegisterPasskey(result.data)
       } else {
         alert("User Already Exist");
       }
@@ -49,7 +49,7 @@ const Register = () => {
   };
 
   const handleRegisterPasskey = async (user:any) => {
-  
+  console.log(user, "kkk")
     try {
       const response = await fetch("/api/authentication/register-challenge", {
         body: JSON.stringify(user),
@@ -57,13 +57,12 @@ const Register = () => {
       });
 
       const result = await response.json();
+      console.log('authenticationResponse', result)
       if (result.success) {
 
         const { options } = result;
 
-        const authenticationResponse =
-          await startRegistration(options);
-       
+        const authenticationResponse = await startRegistration(options);
         const res = await fetch("/api/authentication/register-verify", {
           body: JSON.stringify({userId:user?.id , cred:authenticationResponse}),
           method: "POST",
@@ -73,7 +72,8 @@ const Register = () => {
         alert("something wrong");
       }
     } catch (error) {
-      alert("failed!");
+      console.log(error)
+      alert("hey failed!");
     }
   };
 
