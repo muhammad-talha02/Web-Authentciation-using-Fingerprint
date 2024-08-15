@@ -9,7 +9,7 @@ import { startRegistration } from "@simplewebauthn/browser";
 
 const Register = () => {
   const router = useRouter();
-  const [showPassKey, setShowPassKey] = useState(false)
+  const [showPassKey, setShowPassKey] = useState(false);
   const [registerValues, setRegisterValues] = useState({
     username: "",
     email: "malik@gmail.com",
@@ -38,8 +38,8 @@ const Register = () => {
 
       const result = await response.json();
       if (result.success) {
-        setShowPassKey(true)
-       await handleRegisterPasskey(result.data)
+        setShowPassKey(true);
+        await handleRegisterPasskey(result.data);
       } else {
         alert("User Already Exist");
       }
@@ -48,8 +48,8 @@ const Register = () => {
     }
   };
 
-  const handleRegisterPasskey = async (user:any) => {
-  console.log(user, "kkk")
+  const handleRegisterPasskey = async (user: any) => {
+    console.log(user, "kkk");
     try {
       const response = await fetch("/api/authentication/register-challenge", {
         body: JSON.stringify(user),
@@ -57,22 +57,31 @@ const Register = () => {
       });
 
       const result = await response.json();
-      console.log('authenticationResponse', result)
       if (result.success) {
-
         const { options } = result;
 
+        console.log("authenticationResponse", user?._id);
         const authenticationResponse = await startRegistration(options);
         const res = await fetch("/api/authentication/register-verify", {
-          body: JSON.stringify({userId:user?.id , cred:authenticationResponse}),
+          body: JSON.stringify({
+            userId: user?._id,
+            cred: authenticationResponse,
+          }),
           method: "POST",
         });
 
+        const resultVerification = await res.json();
+        if (resultVerification.verified) {
+          router.push("/login");
+          alert("Pass Key Registered");
+        } else {
+          alert("Pass Key Failed");
+        }
       } else {
         alert("something wrong");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       alert("hey failed!");
     }
   };
@@ -89,13 +98,17 @@ const Register = () => {
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              {showPassKey ? "Resgister Passkey" : 'Create an account'}
+              {showPassKey ? "Resgister Passkey" : "Create an account"}
             </h1>
-            {
-              showPassKey ?             <div className="flex justify-center items-center">
-              <FingerprintButton />
-            </div> : 
-                <form className="space-y-4 md:space-y-6" onSubmit={handleRegister}>
+            {showPassKey ? (
+              <div className="flex justify-center items-center">
+                <FingerprintButton />
+              </div>
+            ) : (
+              <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleRegister}
+              >
                 <div>
                   <label
                     htmlFor="username"
@@ -150,7 +163,7 @@ const Register = () => {
                     placeholder="••••••••"
                     className={styles.inputStyle}
                   />
-                </div>     
+                </div>
                 <button
                   type="submit"
                   className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
@@ -167,9 +180,7 @@ const Register = () => {
                   </Link>
                 </p>
               </form>
-            }
-
-        
+            )}
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ const challengeSchema = new Schema({
         ref:"User"
       },
       challenge: {
-        type: {},
+        type: Object,
         // of: Schema.Types.Mixed,
         required: true
       },

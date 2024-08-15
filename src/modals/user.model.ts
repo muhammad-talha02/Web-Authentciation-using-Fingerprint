@@ -10,6 +10,11 @@ const userSchema = new Schema({
     password:{
         type:String, required:true
     },
+    passkey: {
+        type: Object,
+        // of: Schema.Types.Mixed,
+        // required: true
+      }
 })
 
 const User = models.User || model("User", userSchema)

@@ -1,5 +1,6 @@
 "use client";
 import { styles } from "@/styles";
+import { startAuthentication } from "@simplewebauthn/browser";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react";
@@ -33,7 +34,8 @@ const Login = () => {
 
       const result = await response.json();
       if (result.success) {
-        router.push("/");
+        await handleVerifiedPasskey(result?.user)
+        // router.push("/");
       } else {
         alert(result.message);
       }
@@ -42,6 +44,43 @@ const Login = () => {
     }
   };
 
+  const handleVerifiedPasskey = async (user: any) => {
+    console.log(user, "kkk");
+    try {
+      const response = await fetch("/api/authentication/login-challenge", {
+        body: JSON.stringify({user}),
+        method: "POST",
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const { options } = result;
+
+        console.log("authenticationResponse", user?._id);
+        const authenticationResponse = await startAuthentication(options);
+        const res = await fetch("/api/authentication/register-verify", {
+          body: JSON.stringify({
+            userId: user?._id,
+            cred: authenticationResponse,
+          }),
+          method: "POST",
+        });
+
+        const resultVerification = await res.json();
+        if (resultVerification.verified) {
+          router.push("/login");
+          alert("Pass Key Registered");
+        } else {
+          alert("Pass Key Failed");
+        }
+      } else {
+        alert("something wrong");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("hey failed!");
+    }
+  };
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">

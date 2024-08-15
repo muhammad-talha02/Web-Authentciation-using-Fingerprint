@@ -22,7 +22,7 @@ export const POST = async (request:Request)=>{
         const response = NextResponse.json({success:true,data:user}, {status:200})
       const token =  SignAccessToken(user?.id)
       console.log("user", token)
-        response.cookies.set("user", token, {maxAge:60, httpOnly:true})
+        response.cookies.set("user", token, {maxAge:60 * 60, httpOnly:true})
         return response 
     } catch (error) {
         return NextResponse.json({success: false, message:error}, {status:400})
