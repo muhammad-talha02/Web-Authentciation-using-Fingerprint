@@ -17,8 +17,8 @@ export const POST = async (request: Request) => {
 
     const options: VerifyAuthenticationResponseOpts = {
       expectedChallenge: res.challenge,
-      expectedOrigin: "http://localhost:3000",
-      expectedRPID: "localhost",
+      expectedOrigin: "https://web-authentciation-using-fingerprint.vercel.app/",
+      expectedRPID: "web-authentciation-using-fingerprint.vercel.app",
       response: cred,
       authenticator: {
         ...user.passkey,

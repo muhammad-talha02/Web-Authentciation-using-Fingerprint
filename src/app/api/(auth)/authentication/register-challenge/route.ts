@@ -8,7 +8,7 @@ export const POST = async (request: Request) => {
     await connectDB();
     const user = await request.json();
     const payload = await generateRegistrationOptions({
-      rpID: "localhost",
+      rpID: "web-authentciation-using-fingerprint.vercel.app",
       rpName: "Local Machine",
       userName: user?.username,
     });
