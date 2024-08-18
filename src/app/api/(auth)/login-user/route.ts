@@ -3,9 +3,9 @@ import { User } from "@/modals";
 import { NextResponse } from "next/server";
 
 export const POST = async (request: Request) => {
+  await connectDB();
   try {
     const body = await request.json();
-    await connectDB();
     const user = await User.findOne({ email: body.email });
     if (!user) {
       return NextResponse.json(

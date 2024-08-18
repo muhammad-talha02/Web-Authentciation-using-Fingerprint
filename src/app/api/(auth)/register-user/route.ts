@@ -3,9 +3,8 @@ import { User } from "@/modals"
 import { NextResponse } from "next/server"
 
 export const POST = async (request:Request)=>{
-
+    await connectDB()
     try {
-        await connectDB()
         const body = await request.json()
         const newUser =await User.create(body)
         console.log("Register", newUser)
