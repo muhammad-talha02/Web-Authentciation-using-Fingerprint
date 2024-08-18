@@ -34,7 +34,7 @@ const Login = () => {
 
       const result = await response.json();
       if (result.success) {
-        await handleVerifiedPasskey(result?.user)
+        await handleVerifiedPasskey(result?.data)
         // router.push("/");
       } else {
         alert(result.message);
@@ -48,28 +48,34 @@ const Login = () => {
     console.log(user, "kkk");
     try {
       const response = await fetch("/api/authentication/login-challenge", {
-        body: JSON.stringify({user}),
+        body: JSON.stringify(user),
         method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const result = await response.json();
       if (result.success) {
         const { options } = result;
 
-        console.log("authenticationResponse", user?._id);
         const authenticationResponse = await startAuthentication(options);
-        const res = await fetch("/api/authentication/register-verify", {
+        console.log("authenticationResponse", authenticationResponse);
+        const res = await fetch("/api/authentication/login-verify", {
           body: JSON.stringify({
             userId: user?._id,
             cred: authenticationResponse,
           }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
           method: "POST",
         });
 
         const resultVerification = await res.json();
-        if (resultVerification.verified) {
-          router.push("/login");
-          alert("Pass Key Registered");
+        if (resultVerification.success) {
+          router.push("/");
+          alert("Pass Key success");
         } else {
           alert("Pass Key Failed");
         }

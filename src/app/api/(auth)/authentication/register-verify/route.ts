@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/db";
-import { Challenge } from "@/modals";
+import { Challenge, User } from "@/modals";
 import { verifyRegistrationResponse } from "@simplewebauthn/server";
 import { cookies } from "next/headers";
 
@@ -21,6 +21,14 @@ export const POST = async (request: Request) => {
     if(!verificationResult?.verified){
         return Response.json({message:"Not verified"})
     }
+    const passkeySave = {
+      ...verificationResult.registrationInfo,
+      credentialPublicKey: Buffer.from(verificationResult?.registrationInfo?.credentialPublicKey ||'').toString('base64'),
+      attestationObject: Buffer.from(verificationResult?.registrationInfo?.attestationObject || '').toString('base64')
+    };
+    // Save passkeySave to MongoDB
+    const updateUser = await User.findByIdAndUpdate({_id:userId}, {passkey:passkeySave},{new:true})
+console.log("PAsskey save", updateUser)
     return Response.json({verified:true,message:'Verified Successfully'})
 } catch (error) {
 
