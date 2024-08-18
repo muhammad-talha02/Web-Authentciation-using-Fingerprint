@@ -4,6 +4,7 @@ import { startAuthentication } from "@simplewebauthn/browser";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
@@ -23,7 +24,7 @@ const Login = () => {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(loginValues).includes("")) {
-      alert("Please fill required fields.");
+      toast.error("Please fill required fields.");
       return;
     }
     try {
@@ -33,19 +34,18 @@ const Login = () => {
       });
 
       const result = await response.json();
+      console.log(result,"login")
       if (result.success) {
         await handleVerifiedPasskey(result?.data)
-        // router.push("/");
       } else {
-        alert(result.message);
+        toast.error("Error: " +result.message);
       }
     } catch (error) {
-      alert("Login failed!");
+      toast.error("Login failed!");
     }
   };
 
   const handleVerifiedPasskey = async (user: any) => {
-    console.log(user, "kkk");
     try {
       const response = await fetch("/api/authentication/login-challenge", {
         body: JSON.stringify(user),
@@ -74,17 +74,17 @@ const Login = () => {
 
         const resultVerification = await res.json();
         if (resultVerification.success) {
+          toast.success("Login Successfully")
           router.push("/");
-          alert("Pass Key success");
         } else {
-          alert("Pass Key Failed");
+          toast.error("Verification Failed");
         }
       } else {
-        alert("something wrong");
+        toast.error("something wrong");
       }
     } catch (error) {
       console.log(error);
-      alert("hey failed!");
+      toast.error("hey failed!");
     }
   };
   return (

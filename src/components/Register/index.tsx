@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react";
 import FingerprintButton from "../FingerprintButton";
 import { startRegistration } from "@simplewebauthn/browser";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const router = useRouter();
@@ -27,7 +28,7 @@ const Register = () => {
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(registerValues).includes("")) {
-      alert("Please fill required fields.");
+      toast.error("Please fill required fields.");
       return;
     }
     try {
@@ -41,10 +42,10 @@ const Register = () => {
         setShowPassKey(true);
         await handleRegisterPasskey(result.data);
       } else {
-        alert("User Already Exist");
+        toast.error("User Already Exist");
       }
     } catch (error) {
-      alert("Registration failed!");
+      toast.error("Registration failed!");
     }
   };
 
@@ -73,16 +74,16 @@ const Register = () => {
         const resultVerification = await res.json();
         if (resultVerification.verified) {
           router.push("/login");
-          alert("Pass Key Registered");
+          toast.success("Device Registered Success");
         } else {
-          alert("Pass Key Failed");
+          toast.error("Failed to register device");
         }
       } else {
-        alert("something wrong");
+        toast.error("something wrong");
       }
     } catch (error) {
       console.log(error);
-      alert("hey failed!");
+      toast.error("hey failed!");
     }
   };
 
