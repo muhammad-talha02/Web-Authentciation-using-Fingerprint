@@ -4,7 +4,6 @@ import { isAuthenticate } from "@/services/isAuthenticate.service";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
-console.log(process.env.MONGODB_URL);
 export const GET = async (
   request: NextRequest,
   { params }: { params: { userId: string } }

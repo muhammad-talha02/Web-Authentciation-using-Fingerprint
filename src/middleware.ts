@@ -8,8 +8,6 @@ export function middleware(request:NextRequest){
 if (!token && path !== '/login' && path !== '/register') {
   return NextResponse.redirect(new URL('/login', request.url));
 }
-  console.log("Middle", token)
-
   return NextResponse.next();
 
 }

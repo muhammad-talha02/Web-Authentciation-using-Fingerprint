@@ -17,8 +17,6 @@ const Register = () => {
     password: "123456",
   });
 
-  console.log("values ->", registerValues);
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -50,7 +48,6 @@ const Register = () => {
   };
 
   const handleRegisterPasskey = async (user: any) => {
-    console.log(user, "kkk");
     try {
       const response = await fetch("/api/authentication/register-challenge", {
         body: JSON.stringify(user),
@@ -61,7 +58,6 @@ const Register = () => {
       if (result.success) {
         const { options } = result;
 
-        console.log("authenticationResponse", user?._id);
         const authenticationResponse = await startRegistration(options);
         const res = await fetch("/api/authentication/register-verify", {
           body: JSON.stringify({
@@ -82,7 +78,6 @@ const Register = () => {
         toast.error("something wrong");
       }
     } catch (error) {
-      console.log(error);
       toast.error("hey failed!");
     }
   };

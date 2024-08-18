@@ -13,8 +13,6 @@ const Login = () => {
     password: "123456",
   });
 
-  console.log("values ->", loginValues);
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -34,7 +32,6 @@ const Login = () => {
       });
 
       const result = await response.json();
-      console.log(result,"login")
       if (result.success) {
         await handleVerifiedPasskey(result?.data)
       } else {
@@ -60,7 +57,6 @@ const Login = () => {
         const { options } = result;
 
         const authenticationResponse = await startAuthentication(options);
-        console.log("authenticationResponse", authenticationResponse);
         const res = await fetch("/api/authentication/login-verify", {
           body: JSON.stringify({
             userId: user?._id,
@@ -83,7 +79,6 @@ const Login = () => {
         toast.error("something wrong");
       }
     } catch (error) {
-      console.log(error);
       toast.error("hey failed!");
     }
   };
@@ -147,7 +142,7 @@ const Login = () => {
                 Sign in
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don't have an account?{" "}
+                {`Don't have an account`}
                 <Link
                   href="/register"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"

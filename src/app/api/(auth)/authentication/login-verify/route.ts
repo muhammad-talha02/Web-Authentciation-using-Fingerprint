@@ -49,7 +49,7 @@ export const POST = async (request: Request) => {
     response.cookies.set("user", token, { maxAge: 60 * 60, httpOnly: true });
     return response
   } catch (error) {
-    console.log("Error", error);
+
     return Response.json({ success: false, error }, { status: 400 });
   }
 };

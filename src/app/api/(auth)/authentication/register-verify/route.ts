@@ -14,7 +14,6 @@ export const POST = async (request: Request) => {
       expectedOrigin: "http://localhost:3000",
       response: cred,
     });
-    console.log("verificationResult", verificationResult);
 
     if (!verificationResult?.verified) {
       return Response.json({ message: "Not verified" });
@@ -36,7 +35,6 @@ export const POST = async (request: Request) => {
     );
     return Response.json({ verified: true, message: "Verified Successfully" });
   } catch (error) {
-    console.log(error);
     return Response.json({ success: false, message: "Something wrong" });
   }
 };
