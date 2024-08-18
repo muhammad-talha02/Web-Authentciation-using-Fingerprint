@@ -13,7 +13,8 @@ export const connectDB = async () => {
     console.log("Please wait Connecting..... ");
     return;
   }
-
+console.log("Db: ->", process.env.NEXT_PUBLIC_MONGODB_URL)
+console.log("Test: ->", process.env.TEST)
   try {
     mongoose.connect(MONGODB_URL!, {
       dbName: "webAuthentication",
