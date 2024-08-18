@@ -28,7 +28,7 @@ export const POST = async (request: Request) => {
     return response;
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: error },
+      { success: false, message: "SOmething wrong!" },
       { status: 400 }
     );
   }

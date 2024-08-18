@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URL = process.env.MONGODB_URL;
+const MONGODB_URL = process.env.NEXT_PUBLIC_MONGODB_URL;
 
 export const connectDB = async () => {
   const connectionState = mongoose.connection.readyState;
@@ -19,7 +19,7 @@ export const connectDB = async () => {
       dbName: "webAuthentication",
       bufferCommands: false,
     });
-    console.log("Connected");
+    console.log("DB Connected");
   } catch (error) {
     console.log("Error: In Connection", error);
   }
