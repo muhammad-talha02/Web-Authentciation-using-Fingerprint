@@ -27,6 +27,8 @@ export const connectDB = async () => {
   if (!cached.promise) {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
+          dbName: "webAuthentication",
+
     };
 
     cached.promise = mongoose.connect(MONGODB_URL, opts).then((mongoose) => {
