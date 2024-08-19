@@ -3,26 +3,41 @@ import { styles } from "@/styles";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  FormEventHandler,
+  useEffect,
+  useState,
+} from "react";
 import FingerprintButton from "../FingerprintButton";
 import { startRegistration } from "@simplewebauthn/browser";
 import toast from "react-hot-toast";
 
 const Register = () => {
+  //? Router
   const router = useRouter();
+
+  //? State: To Manage Conenction
+  const [serverConnection, setServerConnection] = useState(false);
+
+  //? State: To Show/Hide PassKey Scanner
   const [showPassKey, setShowPassKey] = useState(false);
+
+  //? State: Register Values
   const [registerValues, setRegisterValues] = useState({
     username: "",
-    email: "malik@gmail.com",
-    password: "123456",
+    email: "",
+    password: "",
   });
 
+  //? Function: Handle change values of form
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     setRegisterValues((prev) => ({ ...prev, [name]: value }));
   };
 
+  //? Function: Register User
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(registerValues).includes("")) {
@@ -47,18 +62,22 @@ const Register = () => {
     }
   };
 
+  //? Function: Register Passkey
   const handleRegisterPasskey = async (user: any) => {
+    //? Start Registartion
     try {
       const response = await fetch("/api/authentication/register-challenge", {
         body: JSON.stringify(user),
         method: "POST",
       });
+      const resultChallenge = await response.json();
 
-      const result = await response.json();
-      if (result.success) {
-        const { options } = result;
+      if (resultChallenge.success) {
+        const { options } = resultChallenge;
 
         const authenticationResponse = await startRegistration(options);
+
+        //? Verify Registration
         const res = await fetch("/api/authentication/register-verify", {
           body: JSON.stringify({
             userId: user?._id,
@@ -73,17 +92,37 @@ const Register = () => {
           toast.success("Device Registered Success");
         } else {
           toast.error("Failed to register device");
+          setShowPassKey(false);
         }
       } else {
         toast.error("something wrong");
+        setShowPassKey(false);
       }
     } catch (error) {
-      toast.error("hey failed!");
+      setShowPassKey(false);
+      toast.error("Failed Register!");
     }
   };
 
+  //! Effect for Check server Connection
+  useEffect(() => {
+    const isServerActive = async () => {
+      const res = await fetch("/api/test");
+      const data = await res.json();
+      if (data.success) {
+        setServerConnection(true);
+        return;
+      }
+      setServerConnection(false);
+    };
+    isServerActive();
+  }, []);
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="text-center">
+        {serverConnection ? "Server Connected" : "Server Connecting......"}
+      </div>
+
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a
           href="#"

@@ -1,5 +1,5 @@
 export async function GET(){
-    return Response.json([{id:1, name:"Talha"}])
+    return Response.json({success:true, message:"Server is Ready"})
 }
 
 export async function POST(request:Request){

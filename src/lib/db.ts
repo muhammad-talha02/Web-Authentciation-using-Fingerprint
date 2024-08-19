@@ -4,9 +4,9 @@ interface CachedConnection {
   conn: Mongoose | null;
   promise: Promise<Mongoose> | null;
 }
-const MONGODB_URL = process.env.NEXT_PUBLIC_MONGODB_URL;
+const DB_URL = process.env.MONGODB_URL;
 
-if (!MONGODB_URL) {
+if (!DB_URL) {
   throw new Error(
     "Please define the MONGODB_URI environment variable inside .env.local"
   );
@@ -31,12 +31,11 @@ export const connectDB = async () => {
 
     };
 
-    cached.promise = mongoose.connect(MONGODB_URL, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(DB_URL, opts).then((mongoose) => {
       return mongoose;
     });
   }
-  console.log("Db: ->", process.env.NEXT_PUBLIC_MONGODB_URL);
-  console.log("Test: ->", process.env.TEST);
+
   try {
     cached.conn = await cached.promise;
   } catch (e) {

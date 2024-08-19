@@ -3,14 +3,22 @@ import { styles } from "@/styles";
 import { startAuthentication } from "@simplewebauthn/browser";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, FormEventHandler, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  FormEventHandler,
+  useEffect,
+  useState,
+} from "react";
 import toast from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
+  const [serverConnection, setServerConnection] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [loginValues, setLoginValues] = useState({
-    email: "malik@gmail.com",
-    password: "123456",
+    email: "",
+    password: "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +33,7 @@ const Login = () => {
       toast.error("Please fill required fields.");
       return;
     }
+    setIsLoading(true);
     try {
       const response = await fetch("/api/login-user", {
         body: JSON.stringify(loginValues),
@@ -33,12 +42,14 @@ const Login = () => {
 
       const result = await response.json();
       if (result.success) {
-        await handleVerifiedPasskey(result?.data)
+        await handleVerifiedPasskey(result?.data);
       } else {
-        toast.error("Error: " +result.message);
+        toast.error("Error: " + result.message);
+        setIsLoading(false);
       }
     } catch (error) {
       toast.error("Login failed!");
+      setIsLoading(false);
     }
   };
 
@@ -48,7 +59,7 @@ const Login = () => {
         body: JSON.stringify(user),
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -63,27 +74,46 @@ const Login = () => {
             cred: authenticationResponse,
           }),
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           method: "POST",
         });
 
         const resultVerification = await res.json();
         if (resultVerification.success) {
-          toast.success("Login Successfully")
+          toast.success("Login Successfully");
           router.push("/");
         } else {
           toast.error("Verification Failed");
+          setIsLoading(false);
         }
       } else {
         toast.error("something wrong");
       }
     } catch (error) {
-      toast.error("hey failed!");
+      toast.error("Hey failed!");
     }
   };
+
+    //! Effect for Check server Connection
+
+  useEffect(() => {
+    const isServerActive = async () => {
+      const res = await fetch("/api/test");
+      const data = await res.json();
+      if (data.success) {
+        setServerConnection(true);
+        return;
+      }
+      setServerConnection(false);
+    };
+    isServerActive();
+  }, []);
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="text-center">
+        {serverConnection ? "Server Connected" : "Server Connecting......"}
+      </div>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a
           href="#"
@@ -134,12 +164,13 @@ const Login = () => {
                   className={styles.inputStyle}
                 />
               </div>
-             
+
               <button
                 type="submit"
+                disabled={isLoading}
                 className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
-                Sign in
+                {isLoading ? "Signing......." : "Sign in"}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 {`Don't have an account? `}

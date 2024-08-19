@@ -3,7 +3,7 @@ import jwt, { Secret } from "jsonwebtoken";
 //? Verify Access Token
 
 export const verifyAccessToken = (token: string) => {
-  const decoded = jwt.verify(token, process.env.NEXT_PUBLIC_ACCESS_TOKEN as Secret);
+  const decoded = jwt.verify(token, process.env.ACCESS_TOKEN as Secret);
   return decoded;
 };
 
