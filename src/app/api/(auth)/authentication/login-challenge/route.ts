@@ -1,8 +1,6 @@
 import { connectDB } from "@/lib/db";
 import { Challenge } from "@/modals";
-import { isAuthenticate } from "@/services/isAuthenticate.service";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { cookies } from "next/headers";
 
 export const POST = async (request: Request) => {
   
@@ -10,7 +8,7 @@ export const POST = async (request: Request) => {
     await connectDB();
     const user = await request.json();
     const payload = await generateAuthenticationOptions({
-      rpID: "localhost",
+      rpID: "web-authentciation-using-fingerprint.vercel.app",
     });
 
      await Challenge.findOneAndUpdate(
