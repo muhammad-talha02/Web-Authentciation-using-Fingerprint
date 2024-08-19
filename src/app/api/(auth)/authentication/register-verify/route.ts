@@ -10,8 +10,8 @@ export const POST = async (request: Request) => {
     const res: any = await Challenge.findOne({ userId });
     const verificationResult = await verifyRegistrationResponse({
       expectedChallenge: res?.challenge,
-      expectedRPID: "web-authentciation-using-fingerprint.vercel.app",
-      expectedOrigin: "https://web-authentciation-using-fingerprint.vercel.app",
+      expectedRPID: process.env.RP_ID as string,
+      expectedOrigin: process.env.RP_ORIGIN as string,
       response: cred,
     });
 

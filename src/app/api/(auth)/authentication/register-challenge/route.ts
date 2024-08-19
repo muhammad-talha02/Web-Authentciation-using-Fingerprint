@@ -8,8 +8,8 @@ export const POST = async (request: Request) => {
     await connectDB();
     const user = await request.json();
     const payload = await generateRegistrationOptions({
-      rpID: "web-authentciation-using-fingerprint.vercel.app",
-      rpName: "Local Machine",
+      rpID: process.env.RP_ID as string,
+      rpName: "Live Website",
       userName: user?.username,
     });
     await Challenge.create({

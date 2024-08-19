@@ -8,7 +8,7 @@ export const POST = async (request: Request) => {
     await connectDB();
     const user = await request.json();
     const payload = await generateAuthenticationOptions({
-      rpID: "web-authentciation-using-fingerprint.vercel.app",
+      rpID: process.env.RP_ID as string,
     });
 
      await Challenge.findOneAndUpdate(
